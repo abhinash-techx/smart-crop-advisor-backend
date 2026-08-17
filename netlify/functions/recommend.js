@@ -1,0 +1,158 @@
+const { GoogleGenAI } = require("@google/genai");
+const { recommendCrops } = require("../../recommendation");
+
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
+});
+
+exports.handler = async function (event) {
+
+    // Only POST requests allowed
+    if (event.httpMethod !== "POST") {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({
+                success: false,
+                message: "Only POST method is allowed"
+            })
+        };
+    }
+
+    try {
+
+        const farmerData = JSON.parse(event.body);
+
+        console.log("Farmer Data Received:");
+        console.log(farmerData);
+
+
+        // ================================
+        // LOCAL CROP RECOMMENDATION
+        // ================================
+
+        const recommendations =
+            recommendCrops(farmerData);
+
+        console.log("Local Recommendations:");
+        console.log(recommendations);
+
+
+        // ================================
+        // GEMINI AI
+        // ================================
+
+        const prompt = `
+You are an agricultural advisor helping a small farmer in India.
+
+Analyze the following farmer information:
+
+Farmer Name: ${farmerData.farmerName}
+State: ${farmerData.state}
+District/Village: ${farmerData.district}
+
+Land Area: ${farmerData.landArea} acres
+Soil Type: ${farmerData.soilType}
+Soil pH: ${farmerData.ph}
+Water Availability: ${farmerData.waterAvailability}
+Previous Crop: ${farmerData.previousCrop}
+Farming Type: ${farmerData.farmingType}
+
+Average Temperature: ${farmerData.temperature} °C
+Expected Rainfall: ${farmerData.rainfall} mm
+Sowing Season: ${farmerData.sowingSeason}
+Fertilizer Usage: ${farmerData.fertilizerUsage}
+
+Our rule-based system has recommended these crops:
+
+${JSON.stringify(recommendations, null, 2)}
+
+Give a short, practical agricultural advisory.
+
+Explain:
+1. Which crop is the best choice and why.
+2. Why the soil and climate are suitable.
+3. Water requirement.
+4. One important farming tip.
+5. One risk or caution.
+
+Keep the answer simple enough for a small farmer to understand.
+Do not invent exact prices or guarantees.
+`;
+
+
+        const response =
+            await ai.models.generateContent({
+
+                model: "gemini-3.6-flash",
+
+                contents: prompt
+
+            });
+
+
+        const aiAdvice = response.text;
+
+
+        console.log("Gemini Advice:");
+        console.log(aiAdvice);
+
+
+        // ================================
+        // RESPONSE
+        // ================================
+
+        return {
+
+            statusCode: 200,
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                success: true,
+
+                recommendations:
+                    recommendations,
+
+                aiAdvice:
+                    aiAdvice
+
+            })
+
+        };
+
+
+    } catch (error) {
+
+        console.error(
+            "Recommendation Error:",
+            error
+        );
+
+        return {
+
+            statusCode: 500,
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                success: false,
+
+                message:
+                    "Failed to generate crop recommendation",
+
+                error:
+                    error.message
+
+            })
+
+        };
+
+    }
+
+};
