@@ -296,8 +296,8 @@ recommendButton.addEventListener(
 
 
             alert(
-                "❌ Backend connection error.\n\n" +
-                "Make sure server.js is running."
+             "❌ Backend Error:\n\n" +
+                 error.message
             );
 
 
