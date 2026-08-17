@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Crop Advisor</title>
+
+    <link rel="stylesheet" href="getstarted.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+
+        <div class="logo">
+            🌱 Black<span>Terminal</span>
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+
+        <div class="heading">
+
+            <div class="icon">👨‍🌾</div>
+
+            <h1>Enter Farmer Details</h1>
+
+            <p>
+                Provide your farm information to get personalized
+                crop recommendations.
+            </p>
+
+        </div>
+
+
+        <div class="form-card">
+
+
+            <!-- ================= FARMER INFORMATION ================= -->
+
+            <section class="section">
+
+                <div class="section-title">
+                    <span>👨‍🌾</span>
+                    <h2>Farmer Information</h2>
+                </div>
+
+                <div class="form-grid">
+
+
+                    <div class="input-box">
+
+                        <label>Farmer Name</label>
+
+                        <input
+                            type="text"
+                            id="farmerName"
+                            placeholder="Enter your name"
+                        >
+
+                    </div>
+
+
+                    <div class="input-box">
+
+                        <label>Mobile Number</label>
+
+                        <input
+                            type="tel"
+                            id="mobile"
+                            placeholder="Enter mobile number"
+                        >
+
+                    </div>
+
+
+                    <div class="input-box">
+
+                        <label>State</label>
+
+                        <select id="state">
+
+                            <option value="">
+                                Select State
+                            </option>
+
+                            <option>Uttar Pradesh</option>
+                            <option>Bihar</option>
+                            <option>Assam</option>
+                            <option>West Bengal</option>
+                            <option>Odisha</option>
+                            <option>Jharkhand</option>
+                            <option>Meghalaya</option>
+                            <option>Manipur</option>
+                            <option>Tripura</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="input-box">
+
+                        <label>District / Village</label>
+
+                        <input
+                            type="text"
+                            id="district"
+                            placeholder="Enter district or village"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= FARM DETAILS ================= -->
+
+            <section class="section">
+
+                <div class="section-title">
+
+                    <span>🌱</span>
+
+                    <h2>Farm Details</h2>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="input-box">
+
+                        <label>Land Area (in acres)</label>
+
+                        <input
+                            type="number"
+                            id="landArea"
+                            placeholder="e.g. 2.5"
+                        >
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Soil Type</label>
+
+                        <select id="soilType">
+
+                            <option value="">
+                                Select Soil Type
+                            </option>
+
+                            <option>Loamy</option>
+                            <option>Clayey</option>
+                            <option>Sandy Loam</option>
+                            <option>Black Soil</option>
+                            <option>Red Soil</option>
+                            <option>Alluvial</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Soil pH</label>
+
+                        <input
+                            type="number"
+                            id="ph"
+                            step="0.1"
+                            placeholder="e.g. 6.5"
+                        >
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Water Availability</label>
+
+                        <select id="waterAvailability">
+
+                            <option value="">
+                                Select Availability
+                            </option>
+
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                            <option>Rainwater Dependent</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Previous Crop</label>
+
+                        <input
+                            type="text"
+                            id="previousCrop"
+                            placeholder="e.g. Rice"
+                        >
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Farming Type</label>
+
+                        <select id="farmingType">
+
+                            <option value="">
+                                Select Farming Type
+                            </option>
+
+                            <option>Irrigated</option>
+                            <option>Rain-fed</option>
+                            <option>Organic</option>
+                            <option>Conventional</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= ENVIRONMENT ================= -->
+
+            <section class="section">
+
+                <div class="section-title">
+
+                    <span>🌦️</span>
+
+                    <h2>Environmental Information</h2>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="input-box">
+
+                        <label>Average Temperature (°C)</label>
+
+                        <input
+                            type="number"
+                            id="temperature"
+                            placeholder="e.g. 28"
+                        >
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Expected Rainfall (mm)</label>
+
+                        <input
+                            type="number"
+                            id="rainfall"
+                            placeholder="e.g. 850"
+                        >
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Sowing Season</label>
+
+                        <select id="sowingSeason">
+
+                            <option value="">
+                                Select Season
+                            </option>
+
+                            <option>Kharif</option>
+                            <option>Rabi</option>
+                            <option>Zaid</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="input-box">
+
+                        <label>Fertilizer Usage</label>
+
+                        <select id="fertilizerUsage">
+
+                            <option value="">
+                                Select Usage
+                            </option>
+
+                            <option>Low</option>
+                            <option>Moderate</option>
+                            <option>High</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= BUTTON ================= -->
+
+            <div class="button-area">
+
+                <button
+                    type="button"
+                    class="recommend-btn"
+                    id="recommendBtn"
+                >
+
+                    🌾 Get Smart Recommendation →
+
+                </button>
+
+
+                <p class="note">
+
+                    Your information will be used to generate personalized
+                    crop recommendations.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="getstarted.js"></script>
+
+</body>
+
+</html>

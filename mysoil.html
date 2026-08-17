@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Soil Analysis | SmartCrop</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f3f8f1;
+            color: #17351d;
+        }
+
+        /* NAVBAR */
+        nav {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #218739;
+        }
+
+        .logo span {
+            color: #79b82a;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #526052;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #218739;
+        }
+
+        /* MAIN */
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heading .icon {
+            font-size: 45px;
+        }
+
+        .heading h1 {
+            font-size: 34px;
+            margin: 8px 0;
+        }
+
+        .heading p {
+            color: #687568;
+            font-size: 15px;
+        }
+
+        /* CARD */
+        .analysis-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 35px rgba(34, 88, 39, 0.10);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e4ece2;
+            padding-bottom: 12px;
+            margin-bottom: 22px;
+        }
+
+        .section-title span {
+            font-size: 23px;
+        }
+
+        .section-title h2 {
+            color: #226b30;
+            font-size: 20px;
+        }
+
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-box label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #455447;
+        }
+
+        .input-box input,
+        .input-box select {
+            height: 46px;
+            border: 1px solid #d6e1d4;
+            border-radius: 10px;
+            padding: 0 14px;
+            outline: none;
+            background: #fbfdfb;
+            font-size: 14px;
+        }
+
+        .input-box input:focus,
+        .input-box select:focus {
+            border-color: #55a45d;
+            box-shadow: 0 0 0 3px rgba(85,164,93,0.12);
+        }
+
+        /* UPLOAD */
+        .upload-box {
+            margin-top: 25px;
+            border: 2px dashed #a8cba9;
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+            background: #f8fcf7;
+        }
+
+        .upload-box .upload-icon {
+            font-size: 35px;
+        }
+
+        .upload-box h3 {
+            margin: 8px 0;
+            color: #276d34;
+            font-size: 17px;
+        }
+
+        .upload-box p {
+            color: #788378;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box input {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* BUTTON */
+        .button-area {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .analyze-btn {
+            border: none;
+            background: linear-gradient(135deg, #218739, #6eaf2e);
+            color: white;
+            padding: 15px 38px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(33,135,57,0.25);
+            transition: 0.3s;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(33,135,57,0.30);
+        }
+
+        .note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #7a857a;
+        }
+
+        /* RESULT */
+        .result-box {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 16px;
+            background: #f5faf3;
+            border: 1px solid #dcebd9;
+        }
+
+        .result-box h2 {
+            color: #247332;
+            margin-bottom: 18px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .result-card .emoji {
+            font-size: 25px;
+        }
+
+        .result-card h3 {
+            font-size: 13px;
+            color: #687568;
+            margin: 7px 0;
+        }
+
+        .result-card strong {
+            font-size: 18px;
+            color: #247332;
+        }
+
+        /* MOBILE */
+        @media(max-width: 700px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .heading h1 {
+                font-size: 27px;
+            }
+
+            .analysis-card {
+                padding: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+
+        <div class="logo">
+            🌱 Black<span>Terminal</span>
+        </div>
+
+        <ul class="nav-links">
+            // write somethhin here
+        </ul>
+
+    </nav>
+
+
+    <!-- MAIN -->
+    <main class="container">
+
+        <div class="heading">
+
+            <div class="icon">🧪</div>
+
+            <h1>Analyze My Soil</h1>
+
+            <p>
+                Enter your soil information to understand soil health
+                and get personalized recommendations.
+            </p>
+
+        </div>
+
+
+        <div class="analysis-card">
+
+            <!-- SOIL INFORMATION -->
+            <div class="section-title">
+                <span>🌱</span>
+                <h2>Soil Information</h2>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="input-box">
+                    <label>Soil Type</label>
+
+                    <select>
+                        <option>Select Soil Type</option>
+                        <option>Loamy Soil</option>
+                        <option>Clay Soil</option>
+                        <option>Sandy Soil</option>
+                        <option>Black Soil</option>
+                        <option>Red Soil</option>
+                        <option>Alluvial Soil</option>
+                    </select>
+                </div>
+
+
+                <div class="input-box">
+                    <label>Soil pH</label>
+                    <input
+                        type="number"
+                        step="0.1"
+                        placeholder="Example: 6.5">
+                </div>
+
+
+                <div class="input-box">
+                    <label>Nitrogen (N) — mg/kg</label>
+                    <input
+                        type="number"
+                        placeholder="Example: 90">
+                </div>
+
+
+                <div class="input-box">
+                    <label>Phosphorus (P) — mg/kg</label>
+                    <input
+                        type="number"
+                        placeholder="Example: 45">
+                </div>
+
+
+                <div class="input-box">
+                    <label>Potassium (K) — mg/kg</label>
+                    <input
+                        type="number"
+                        placeholder="Example: 40">
+                </div>
+
+
+                <div class="input-box">
+                    <label>Soil Moisture (%)</label>
+                    <input
+                        type="number"
+                        placeholder="Example: 35">
+                </div>
+
+            </div>
+
+
+            <!-- LOCATION -->
+            <div class="section-title" style="margin-top:35px;">
+                <span>📍</span>
+                <h2>Farm Location</h2>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="input-box">
+                    <label>State</label>
+
+                    <select>
+                        <option>Select State</option>
+                        <option>Uttar Pradesh</option>
+                        <option>Bihar</option>
+                        <option>Assam</option>
+                        <option>West Bengal</option>
+                        <option>Odisha</option>
+                        <option>Jharkhand</option>
+                        <option>Meghalaya</option>
+                        <option>Manipur</option>
+                        <option>Tripura</option>
+                    </select>
+                </div>
+
+
+                <div class="input-box">
+                    <label>District / Village</label>
+
+                    <input
+                        type="text"
+                        placeholder="Enter district or village">
+                </div>
+
+            </div>
+
+
+            <!-- SOIL REPORT UPLOAD -->
+            <div class="upload-box">
+
+                <div class="upload-icon">📄</div>
+
+                <h3>Upload Soil Test Report</h3>
+
+                <p>
+                    Upload your soil report for more accurate analysis.
+                </p>
+
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png">
+
+            </div>
+
+
+            <!-- BUTTON -->
+            <div class="button-area">
+
+                <button class="analyze-btn">
+                    🧪 Analyze Soil →
+                </button>
+
+                <p class="note">
+                    Our system will analyze soil parameters and provide
+                    suitable crop & fertilizer recommendations.
+                </p>
+
+            </div>
+
+
+            <!-- SAMPLE RESULT -->
+            <div class="result-box">
+
+                <h2>📊 Soil Health Overview</h2>
+
+                <div class="result-grid">
+
+                    <div class="result-card">
+                        <div class="emoji">⚗️</div>
+                        <h3>Soil pH</h3>
+                        <strong>6.5</strong>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="emoji">🌿</div>
+                        <h3>Nitrogen</h3>
+                        <strong>Good</strong>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="emoji">🧪</div>
+                        <h3>Phosphorus</h3>
+                        <strong>Medium</strong>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="emoji">💧</div>
+                        <h3>Moisture</h3>
+                        <strong>35%</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

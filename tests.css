@@ -1,0 +1,17 @@
+/* Crop Recommendation Section */
+section form select,
+section form input {
+  background-color: #fefefe;
+  transition: 0.3s;
+}
+
+section form select:focus,
+section form input:focus {
+  outline: none;
+  border-color: #3a663c;
+  box-shadow: 0 0 0 2px rgba(58, 102, 60, 0.3);
+}
+
+section button {
+  transition: 0.3s;
+}
