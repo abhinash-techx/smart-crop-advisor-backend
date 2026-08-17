@@ -234,7 +234,7 @@ recommendButton.addEventListener(
 
             const response =
                 await fetch(
-                    "http://localhost:5000/recommend",
+                    "/.netlify/functions/recommend",
                     {
 
                         method: "POST",

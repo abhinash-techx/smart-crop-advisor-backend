@@ -1,5 +1,5 @@
 const { GoogleGenAI } = require("@google/genai");
-const { recommendCrops } = require("../../recommendation");
+const { recommendCrops } = require("../../backend/recommendation");
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
