@@ -1,3 +1,11 @@
+const API_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000/recommend"
+        : "/.netlify/functions/recommend";
+
+const recommendButton =
+    document.getElementById("recommendBtn");
+
 const recommendButton =
     document.getElementById("recommendBtn");
 
@@ -234,7 +242,7 @@ recommendButton.addEventListener(
 
             const response =
                 await fetch(
-                    "/.netlify/functions/recommend",
+                    API_URL,
                     {
 
                         method: "POST",
