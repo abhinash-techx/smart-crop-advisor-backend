@@ -276,8 +276,9 @@ recommendButton.addEventListener(
             if (!result.success) {
 
                 throw new Error(
-                    result.message ||
-                    "Recommendation failed"
+                  result.error ||
+                   result.message ||
+                  "Recommendation failed"
                 );
 
             }
