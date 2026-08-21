@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analyze My Soil | Smart Crop Advisor</title>
+
+    <link rel="stylesheet" href="analyze-soil.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+
+        <div class="logo">
+            🌱 Smart Crop Advisor
+        </div>
+
+        <!-- Language Switch -->
+        <select id="languageSelect" class="language-select">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="bho">भोजपुरी</option>
+        </select>
+
+    </header>
+
+
+    <!-- Main Section -->
+    <main class="soil-container">
+
+        <section class="hero-section">
+
+            <span class="badge" data-i18n="badge">
+                🌱 Smart Soil Analysis
+            </span>
+
+            <h1 data-i18n="title">
+                Analyze Your Soil
+            </h1>
+
+            <p data-i18n="subtitle">
+                Choose how you want to analyze your soil and get
+                personalized crop insights.
+            </p>
+
+        </section>
+
+
+        <!-- Two Options -->
+        <section class="analysis-options">
+
+            <!-- Image Analysis -->
+            <div class="analysis-card image-card">
+
+                <div class="card-icon">
+                    📸
+                </div>
+
+                <h2 data-i18n="imageTitle">
+                    Analyze from Soil Image
+                </h2>
+
+                <p data-i18n="imageDescription">
+                    Upload a clear photo of your soil and let AI
+                    visually analyze it.
+                </p>
+
+                <ul>
+                    <li data-i18n="imagePoint1">AI visual soil assessment</li>
+                    <li data-i18n="imagePoint2">Soil appearance & moisture insights</li>
+                    <li data-i18n="imagePoint3">Crop suitability suggestions</li>
+                </ul>
+
+                <button
+                    class="analysis-btn"
+                    id="imageAnalysisBtn"
+                    type="button"
+                    data-i18n="imageButton">
+                    📸 Analyze Soil Image
+                </button>
+
+            </div>
+
+
+            <!-- Manual Analysis -->
+            <div class="analysis-card manual-card">
+
+                <div class="card-icon">
+                    📝
+                </div>
+
+                <h2 data-i18n="manualTitle">
+                    Manual Soil Analysis
+                </h2>
+
+                <p data-i18n="manualDescription">
+                    Enter your soil test values manually for a
+                    detailed analysis.
+                </p>
+
+                <ul>
+                    <li data-i18n="manualPoint1">pH level</li>
+                    <li data-i18n="manualPoint2">Nitrogen, Phosphorus & Potassium</li>
+                    <li data-i18n="manualPoint3">Moisture & soil type</li>
+                </ul>
+
+                <button
+                    class="analysis-btn"
+                    id="manualAnalysisBtn"
+                    type="button"
+                    data-i18n="manualButton">
+                    📝 Enter Soil Details
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- Information -->
+        <section class="info-box">
+
+            <div class="info-icon">💡</div>
+
+            <div>
+                <h3 data-i18n="infoTitle">
+                    Important Note
+                </h3>
+
+                <p data-i18n="infoText">
+                    Soil images provide an AI-based visual assessment.
+                    For accurate pH and NPK values, use soil test
+                    results from a reliable soil testing facility.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Image Upload Modal -->
+    <div class="modal hidden" id="imageModal">
+
+        <div class="modal-content">
+
+            <button class="close-btn" id="closeImageModal">
+                ×
+            </button>
+
+            <h2 data-i18n="uploadTitle">
+                Upload Soil Image
+            </h2>
+
+            <p data-i18n="uploadDescription">
+                Upload a clear photo of the soil.
+            </p>
+
+            <div class="upload-area">
+
+                <div class="upload-icon">
+                    📷
+                </div>
+
+                <label for="soilImage" class="upload-label" data-i18n="chooseImage">
+                    Choose Soil Image
+                </label>
+
+                <input
+                    type="file"
+                    id="soilImage"
+                    accept="image/*"
+                    capture="environment">
+
+                <p id="fileName" class="file-name"></p>
+
+            </div>
+
+            <button
+                class="analyze-upload-btn"
+                id="analyzeImageBtn"
+                type="button"
+                data-i18n="analyzeImage">
+                🔍 Analyze Image
+            </button>
+
+            <p class="small-note" data-i18n="imageNote">
+                Use a clear, well-lit soil photo for better visual analysis.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Manual Soil Modal -->
+    <div class="modal hidden" id="manualModal">
+
+        <div class="modal-content manual-modal-content">
+
+            <button class="close-btn" id="closeManualModal">
+                ×
+            </button>
+
+            <h2 data-i18n="manualFormTitle">
+                Enter Soil Details
+            </h2>
+
+            <p data-i18n="manualFormDescription">
+                Enter values from your soil test report.
+            </p>
+
+
+            <form id="soilForm">
+
+                <!-- Soil Type -->
+                <label for="soilType" data-i18n="soilType">
+                    Soil Type
+                </label>
+
+                <select id="soilType" required>
+                    <option value="" data-i18n="selectSoil">
+                        Select Soil Type
+                    </option>
+
+                    <option value="alluvial" data-i18n="alluvial">
+                        Alluvial
+                    </option>
+
+                    <option value="black" data-i18n="black">
+                        Black Soil
+                    </option>
+
+                    <option value="red" data-i18n="red">
+                        Red Soil
+                    </option>
+
+                    <option value="sandy" data-i18n="sandy">
+                        Sandy Soil
+                    </option>
+
+                    <option value="loamy" data-i18n="loamy">
+                        Loamy Soil
+                    </option>
+
+                    <option value="clay" data-i18n="clay">
+                        Clay Soil
+                    </option>
+                </select>
+
+
+                <!-- pH -->
+                <label for="ph" data-i18n="ph">
+                    Soil pH
+                </label>
+
+                <input
+                    type="number"
+                    id="ph"
+                    min="0"
+                    max="14"
+                    step="0.1"
+                    placeholder="e.g. 6.5"
+                    required>
+
+
+                <!-- Nitrogen -->
+                <label for="nitrogen" data-i18n="nitrogen">
+                    Nitrogen (N)
+                </label>
+
+                <input
+                    type="number"
+                    id="nitrogen"
+                    min="0"
+                    step="0.1"
+                    placeholder="mg/kg"
+                    required>
+
+
+                <!-- Phosphorus -->
+                <label for="phosphorus" data-i18n="phosphorus">
+                    Phosphorus (P)
+                </label>
+
+                <input
+                    type="number"
+                    id="phosphorus"
+                    min="0"
+                    step="0.1"
+                    placeholder="mg/kg"
+                    required>
+
+
+                <!-- Potassium -->
+                <label for="potassium" data-i18n="potassium">
+                    Potassium (K)
+                </label>
+
+                <input
+                    type="number"
+                    id="potassium"
+                    min="0"
+                    step="0.1"
+                    placeholder="mg/kg"
+                    required>
+
+
+                <!-- Moisture -->
+                <label for="moisture" data-i18n="moisture">
+                    Soil Moisture
+                </label>
+
+                <input
+                    type="number"
+                    id="moisture"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="%"
+                    required>
+
+
+                <!-- Location -->
+                <label for="location" data-i18n="location">
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Village / District / State">
+
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                    data-i18n="analyzeSoil">
+                    🌱 Analyze My Soil
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Result Section -->
+    <section id="soilResult" class="soil-result hidden">
+
+        <div class="result-card">
+
+            <h2 data-i18n="resultTitle">
+                🌱 Soil Analysis Result
+            </h2>
+
+            <div id="resultContent"></div>
+
+        </div>
+
+    </section>
+
+
+    <script src="analyze-soil.js"></script>
+
+</body>
+</html>
