@@ -4,4 +4,4 @@
 [[redirects]]
   from = "/api/analyze-soil"
   to = "/.netlify/functions/analyze-soil"
-  status = 200ab 
+  status = 200
