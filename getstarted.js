@@ -6,8 +6,6 @@ const API_URL =
 const recommendButton =
     document.getElementById("recommendBtn");
 
-const recommendButton =
-    document.getElementById("recommendBtn");
 
 
 recommendButton.addEventListener(
