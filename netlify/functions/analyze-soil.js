@@ -6,6 +6,7 @@ const ai = new GoogleGenAI({
 
 exports.handler = async (event) => {
 
+    // Only POST request allowed
     if (event.httpMethod !== "POST") {
         return {
             statusCode: 405,
@@ -56,7 +57,9 @@ exports.handler = async (event) => {
                 };
             }
 
+
             const prompt = getImagePrompt(language);
+
 
             const response = await ai.models.generateContent({
 
@@ -82,7 +85,10 @@ exports.handler = async (event) => {
 
             });
 
-            const resultText = response.text || "";
+
+            const resultText =
+                response.text || "";
+
 
             return {
                 statusCode: 200,
@@ -133,28 +139,35 @@ exports.handler = async (event) => {
                 };
             }
 
-            const prompt = getManualPrompt(
-                language,
-                {
-                    soilType,
-                    ph,
-                    nitrogen,
-                    phosphorus,
-                    potassium,
-                    moisture,
-                    location
-                }
-            );
 
-            const response = await ai.models.generateContent({
+            const prompt =
+                getManualPrompt(
+                    language,
+                    {
+                        soilType,
+                        ph,
+                        nitrogen,
+                        phosphorus,
+                        potassium,
+                        moisture,
+                        location
+                    }
+                );
 
-                model: "gemini-3.6-flash",
 
-                contents: prompt
+            const response =
+                await ai.models.generateContent({
 
-            });
+                    model: "gemini-3.6-flash",
 
-            const resultText = response.text || "";
+                    contents: prompt
+
+                });
+
+
+            const resultText =
+                response.text || "";
+
 
             return {
                 statusCode: 200,
@@ -193,12 +206,14 @@ exports.handler = async (event) => {
             })
         };
 
+
     } catch (error) {
 
         console.error(
             "Analyze Soil Function Error:",
             error
         );
+
 
         return {
             statusCode: 500,
@@ -233,52 +248,142 @@ function getImagePrompt(language) {
         return `
 आप एक कृषि विशेषज्ञ AI हैं।
 
-दिए गए मिट्टी के फोटो का दृश्य विश्लेषण करें।
+दिए गए मिट्टी के फोटो का केवल दृश्य आधार पर विश्लेषण करें।
 
 महत्वपूर्ण:
-सिर्फ फोटो के आधार पर pH, NPK या laboratory values को exact बताने का दावा न करें।
+- फोटो से exact pH, NPK या laboratory values का दावा न करें।
+- जहां अनुमान हो वहां "संभावित" या "अनुमान" लिखें।
+- उत्तर छोटा, साफ और किसान के लिए आसान होना चाहिए।
+- लंबे paragraph बिल्कुल न लिखें।
 
-उत्तर केवल छोटे और स्पष्ट bullet points में दें।
+उत्तर बिल्कुल इस format में दें:
 
-इस exact format का उपयोग करें:
+🌱 मिट्टी की स्थिति:
+• 1-2 छोटे points
 
-🌱 मिट्टी का प्रकार
-• संभावित मिट्टी का प्रकार बताएं
-• यदि निश्चित नहीं है तो "संभावित" लिखें
+🪨 संभावित मिट्टी का प्रकार:
+• 1-2 छोटे points
 
-🔍 दिखाई देने वाली विशेषताएं
-• मिट्टी का रंग
-• बनावट
-• कणों की स्थिति
-• अन्य दिखाई देने वाली विशेषताएं
+💧 नमी की स्थिति:
+• 1-2 छोटे points
 
-💧 नमी की स्थिति
-• सूखी / सामान्य / अधिक नमी
-• छोटा कारण
-
-🧪 सामान्य मिट्टी की स्थिति
-• अच्छी / सामान्य / सुधार की आवश्यकता
-• छोटा कारण
-
-🌾 संभावित उपयुक्त फसलें
+🌾 उपयुक्त फसलें:
 • फसल 1
 • फसल 2
 • फसल 3
 
-⚠️ संभावित समस्याएं
-• समस्या 1
-• समस्या 2
-• यदि कोई स्पष्ट समस्या नहीं दिखती तो ऐसा बताएं
+⚠️ ध्यान देने योग्य बातें:
+• 1-2 छोटे points
 
-💡 किसान के लिए सुझाव
-• सुझाव 1
-• सुझाव 2
-• सुझाव 3
+👨‍🌾 किसान के लिए सुझाव:
+• 2-3 practical points
 
-📌 महत्वपूर्ण नोट
-• pH और NPK जैसी exact values केवल proper soil testing से पता चलती हैं।
+उत्तर केवल हिंदी में दें।
+`;
 
-लंबे paragraphs न लिखें।
+    }
+
+
+    if (language === "bho") {
+
+        return `
+रउआ एगो कृषि विशेषज्ञ AI बानी।
+
+दिहल गइल माटी के फोटो के खाली दृश्य आधार पर जांचीं।
+
+जरूरी:
+- फोटो से exact pH, NPK या laboratory value बतावे के दावा मत करीं।
+- जहां अनुमान होखे, "संभावित" या "अनुमान" साफ लिखीं।
+- जवाब छोट, साफ आ किसान खातिर आसान होखे।
+- लंबा paragraph बिल्कुल मत लिखीं।
+
+जवाब ठीक एह format में दीं:
+
+🌱 माटी के स्थिति:
+• 1-2 छोट points
+
+🪨 संभावित माटी के प्रकार:
+• 1-2 छोट points
+
+💧 नमी के स्थिति:
+• 1-2 छोट points
+
+🌾 बढ़िया फसल:
+• फसल 1
+• फसल 2
+• फसल 3
+
+⚠️ ध्यान देवे लायक बात:
+• 1-2 छोट points
+
+👨‍🌾 किसान खातिर सुझाव:
+• 2-3 practical points
+
+जवाब खाली भोजपुरी में दीं।
+`;
+
+    }
+
+
+    return `
+You are an agricultural soil analysis AI.
+
+Analyze the provided soil image using visual observations only.
+
+IMPORTANT:
+- Do NOT claim exact pH, NPK or laboratory values from an ordinary photograph.
+- Clearly label estimates as "Possible" or "Estimated".
+- Keep the answer short and easy for a farmer to understand.
+- Do NOT write long paragraphs.
+
+Use EXACTLY this format:
+
+🌱 Soil Condition:
+• 1-2 short points
+
+🪨 Possible Soil Type:
+• 1-2 short points
+
+💧 Moisture Condition:
+• 1-2 short points
+
+🌾 Suitable Crops:
+• Crop 1
+• Crop 2
+• Crop 3
+
+⚠️ Things to Watch:
+• 1-2 short points
+
+👨‍🌾 Farmer Recommendations:
+• 2-3 practical points
+
+Respond only in English.
+`;
+
+}
+
+    if (language === "hi") {
+
+        return `
+आप एक कृषि विशेषज्ञ AI हैं।
+
+दिए गए मिट्टी के फोटो का सावधानीपूर्वक दृश्य विश्लेषण करें।
+
+महत्वपूर्ण:
+केवल फोटो के आधार पर pH, NPK या अन्य laboratory values को exact बताने का दावा न करें।
+
+विश्लेषण में बताएं:
+
+1. मिट्टी की दिखाई देने वाली विशेषताएं
+2. संभावित मिट्टी का प्रकार
+3. नमी की दृश्य स्थिति
+4. मिट्टी की सामान्य स्थिति
+5. संभावित रूप से उपयुक्त फसलें
+6. किसान के लिए व्यावहारिक सुझाव
+
+जहां जानकारी केवल अनुमान है, वहां स्पष्ट रूप से "संभावित" या "अनुमान" शब्द का उपयोग करें।
+
 उत्तर हिंदी में दें।
 `;
 
@@ -295,47 +400,17 @@ function getImagePrompt(language) {
 जरूरी:
 सिर्फ फोटो के आधार पर pH, NPK या laboratory value के exact बतावे के दावा मत करीं।
 
-जवाब खाली छोट-छोट आ साफ bullet points में दीं।
+जांच में बताईं:
 
-ई exact format इस्तेमाल करीं:
+1. माटी में देखाई देत विशेषता
+2. संभावित माटी के प्रकार
+3. नमी के दृश्य स्थिति
+4. माटी के सामान्य हालत
+5. संभावित रूप से बढ़िया फसल
+6. किसान खातिर काम के सुझाव
 
-🌱 माटी के प्रकार
-• संभावित माटी के प्रकार
-• अगर पक्का ना होखे त "संभावित" लिखीं
+जहां जानकारी अनुमान पर आधारित होखे, साफ-साफ बताईं कि ई संभावित/अनुमान बा।
 
-🔍 देखाई देत विशेषता
-• माटी के रंग
-• बनावट
-• कण के स्थिति
-• अउरी देखाई देत विशेषता
-
-💧 नमी के स्थिति
-• सूखल / सामान्य / जादे नमी
-• छोट कारण
-
-🧪 माटी के सामान्य हालत
-• बढ़िया / सामान्य / सुधार के जरूरत
-• छोट कारण
-
-🌾 संभावित बढ़िया फसल
-• फसल 1
-• फसल 2
-• फसल 3
-
-⚠️ संभावित समस्या
-• समस्या 1
-• समस्या 2
-• अगर साफ समस्या ना दिखे त ई बताईं
-
-💡 किसान खातिर सुझाव
-• सुझाव 1
-• सुझाव 2
-• सुझाव 3
-
-📌 जरूरी जानकारी
-• pH आ NPK के exact value सही soil testing से ही पता चलेला।
-
-लंबा paragraph मत लिखीं।
 जवाब भोजपुरी में दीं।
 `;
 
@@ -347,50 +422,20 @@ You are an agricultural soil analysis AI.
 
 Carefully analyze the provided soil image visually.
 
-IMPORTANT:
+Important:
 Do NOT claim exact pH, NPK or laboratory measurements from an ordinary photograph.
 
-Return ONLY short, clear bullet points.
+Provide:
 
-Use this exact format:
+1. Visible soil characteristics
+2. Possible soil type
+3. Visual moisture condition
+4. General soil condition
+5. Potentially suitable crops
+6. Practical suggestions for the farmer
 
-🌱 Soil Type
-• Possible soil type
-• Clearly mention if it is only an estimate
+Clearly mention when something is only an estimate or visual observation.
 
-🔍 Visible Characteristics
-• Soil color
-• Texture
-• Particle appearance
-• Other visible characteristics
-
-💧 Moisture Condition
-• Dry / Normal / High
-• Short reason
-
-🧪 General Soil Condition
-• Good / Fair / Needs Improvement
-• Short reason
-
-🌾 Potentially Suitable Crops
-• Crop 1
-• Crop 2
-• Crop 3
-
-⚠️ Possible Problems
-• Problem 1
-• Problem 2
-• If no obvious problem is visible, say so
-
-💡 Farmer Recommendations
-• Recommendation 1
-• Recommendation 2
-• Recommendation 3
-
-📌 Important Note
-• Exact pH and NPK values require proper laboratory soil testing.
-
-Do NOT write long paragraphs.
 Respond in English.
 `;
 
@@ -419,55 +464,46 @@ Location: ${soil.location || "Not provided"}
         return `
 आप एक कृषि विशेषज्ञ AI हैं।
 
-किसान की मिट्टी की जांच:
+किसान की मिट्टी की जानकारी:
 
 ${baseData}
 
 इन values का विश्लेषण करें।
 
-उत्तर केवल छोटे और स्पष्ट bullet points में दें।
+लंबे paragraph बिल्कुल न लिखें।
+उत्तर छोटे और स्पष्ट bullet points में दें।
 
-इस exact format का उपयोग करें:
+ठीक इस format का उपयोग करें:
 
-🌱 मिट्टी का स्वास्थ्य
-• अच्छा / सामान्य / सुधार की आवश्यकता
-• छोटा कारण
+🌱 मिट्टी का स्वास्थ्य:
+• स्थिति बताएं
+• छोटा कारण बताएं
 
-🧪 pH की स्थिति
-• pH value: ${soil.ph}
-• अम्लीय / सामान्य / क्षारीय
-• छोटा सुझाव
+🧪 pH की स्थिति:
+• pH कैसा है
+• इसका प्रभाव क्या है
 
-🧬 पोषक तत्वों की स्थिति
-• Nitrogen (N): ${soil.nitrogen}
-• Phosphorus (P): ${soil.phosphorus}
-• Potassium (K): ${soil.potassium}
+🌿 NPK की स्थिति:
+• Nitrogen (N): स्थिति
+• Phosphorus (P): स्थिति
+• Potassium (K): स्थिति
 
-💧 नमी की स्थिति
-• Moisture: ${soil.moisture}%
-• स्थिति और छोटा सुझाव
+💧 नमी की स्थिति:
+• स्थिति बताएं
 
-🌾 उपयुक्त फसलें
+🌾 उपयुक्त फसलें:
 • फसल 1
 • फसल 2
 • फसल 3
 
-⚠️ संभावित समस्याएं
-• समस्या 1
-• समस्या 2
-• यदि कोई बड़ी समस्या नहीं है तो ऐसा बताएं
+⚠️ पोषक तत्वों की कमी:
+• यदि कोई कमी है तो बताएं
+• सुधार का छोटा सुझाव दें
 
-💡 किसान के लिए सुझाव
-• सुझाव 1
-• सुझाव 2
-• सुझाव 3
+👨‍🌾 किसान के लिए सुझाव:
+• 2-3 practical recommendations
 
-📌 खाद / पोषक तत्व सुझाव
-• केवल दिए गए soil values के आधार पर सामान्य सुझाव दें
-• exact fertilizer dosage का दावा न करें
-
-लंबे paragraphs न लिखें।
-आसान हिंदी में उत्तर दें।
+उत्तर केवल आसान हिंदी में दें।
 `;
 
     }
@@ -478,55 +514,46 @@ ${baseData}
         return `
 रउआ एगो कृषि विशेषज्ञ AI बानी।
 
-किसान के माटी जांच:
+किसान के माटी के जानकारी:
 
 ${baseData}
 
-ई जानकारी के जांचीं।
+एह जानकारी के जांचीं।
 
-जवाब खाली छोट-छोट आ साफ bullet points में दीं।
+लंबा paragraph बिल्कुल मत लिखीं।
+जवाब छोट आ साफ bullet points में दीं।
 
-ई exact format इस्तेमाल करीं:
+ठीक एह format में जवाब दीं:
 
-🌱 माटी के स्वास्थ्य
-• बढ़िया / सामान्य / सुधार के जरूरत
-• छोट कारण
+🌱 माटी के स्वास्थ्य:
+• स्थिति बताईं
+• छोट कारण बताईं
 
-🧪 pH के स्थिति
-• pH value: ${soil.ph}
-• अम्लीय / सामान्य / क्षारीय
-• छोट सुझाव
+🧪 pH के स्थिति:
+• pH कइसन बा
+• एकर असर का बा
 
-🧬 पोषक तत्व के स्थिति
-• Nitrogen (N): ${soil.nitrogen}
-• Phosphorus (P): ${soil.phosphorus}
-• Potassium (K): ${soil.potassium}
+🌿 NPK के स्थिति:
+• Nitrogen (N): स्थिति
+• Phosphorus (P): स्थिति
+• Potassium (K): स्थिति
 
-💧 नमी के स्थिति
-• Moisture: ${soil.moisture}%
-• स्थिति आ छोट सुझाव
+💧 नमी के स्थिति:
+• स्थिति बताईं
 
-🌾 बढ़िया फसल
+🌾 बढ़िया फसल:
 • फसल 1
 • फसल 2
 • फसल 3
 
-⚠️ संभावित समस्या
-• समस्या 1
-• समस्या 2
-• अगर कवनो बड़ी समस्या ना होखे त ई बताईं
+⚠️ पोषक तत्व के कमी:
+• अगर कमी बा त बताईं
+• सुधार के छोट सुझाव दीं
 
-💡 किसान खातिर सुझाव
-• सुझाव 1
-• सुझाव 2
-• सुझाव 3
+👨‍🌾 किसान खातिर सुझाव:
+• 2-3 practical सलाह
 
-📌 खाद / पोषक तत्व सुझाव
-• दिहल soil values के आधार पर सामान्य सुझाव दीं
-• exact fertilizer dosage के दावा मत करीं
-
-लंबा paragraph मत लिखीं।
-आसान भोजपुरी में जवाब दीं।
+जवाब खाली आसान भोजपुरी में दीं।
 `;
 
     }
@@ -535,54 +562,132 @@ ${baseData}
     return `
 You are an agricultural soil analysis AI.
 
-Farmer's soil test information:
+Farmer's soil information:
 
 ${baseData}
 
-Analyze the values.
+Analyze the information.
 
-Return ONLY short, clear bullet points.
+Do NOT write long paragraphs.
+Give the answer in short, clear bullet points.
 
-Use this exact format:
+Use EXACTLY this format:
 
-🌱 Soil Health
-• Good / Fair / Needs Improvement
-• Short reason
+🌱 Soil Health:
+• Give the health status
+• Give a short reason
 
-🧪 pH Status
-• pH value: ${soil.ph}
-• Acidic / Normal / Alkaline
-• Short recommendation
+🧪 pH Status:
+• Explain the pH status
+• Mention its possible effect
 
-🧬 Nutrient Status
-• Nitrogen (N): ${soil.nitrogen}
-• Phosphorus (P): ${soil.phosphorus}
-• Potassium (K): ${soil.potassium}
+🌿 NPK Status:
+• Nitrogen (N): status
+• Phosphorus (P): status
+• Potassium (K): status
 
-💧 Moisture Status
-• Moisture: ${soil.moisture}%
-• Condition and short recommendation
+💧 Moisture Status:
+• Give the moisture status
 
-🌾 Suitable Crops
+🌾 Suitable Crops:
 • Crop 1
 • Crop 2
 • Crop 3
 
-⚠️ Possible Problems
-• Problem 1
-• Problem 2
-• If there is no major problem, say so
+⚠️ Nutrient Deficiency:
+• Mention any deficiency
+• Give a short improvement suggestion
 
-💡 Farmer Recommendations
-• Recommendation 1
-• Recommendation 2
-• Recommendation 3
+👨‍🌾 Farmer Recommendations:
+• 2-3 practical recommendations
 
-📌 Fertilizer / Nutrient Suggestions
-• Give general suggestions based on the provided soil values
-• Do not claim an exact fertilizer dosage
+Respond only in simple English.
+`;
 
-Do NOT write long paragraphs.
+}
+
+    const baseData = `
+Soil Type: ${soil.soilType}
+pH: ${soil.ph}
+Nitrogen (N): ${soil.nitrogen}
+Phosphorus (P): ${soil.phosphorus}
+Potassium (K): ${soil.potassium}
+Moisture: ${soil.moisture}%
+Location: ${soil.location || "Not provided"}
+`;
+
+
+    if (language === "hi") {
+
+        return `
+आप एक कृषि विशेषज्ञ AI हैं।
+
+नीचे किसान की मिट्टी की जांच की जानकारी दी गई है:
+
+${baseData}
+
+इन values का विश्लेषण करके आसान हिंदी में बताएं:
+
+1. मिट्टी का स्वास्थ्य
+2. pH की स्थिति
+3. NPK की स्थिति
+4. नमी की स्थिति
+5. उपयुक्त फसलें
+6. पोषक तत्वों की कमी होने पर सुझाव
+7. किसान के लिए practical recommendations
+
+जहां संभव हो, स्पष्ट और आसान भाषा का उपयोग करें।
+
+उत्तर हिंदी में दें।
+`;
+
+    }
+
+
+    if (language === "bho") {
+
+        return `
+रउआ एगो कृषि विशेषज्ञ AI बानी।
+
+किसान के माटी जांच के जानकारी नीचे दिहल बा:
+
+${baseData}
+
+एकरा के आसान भोजपुरी में जांचीं आ बताईं:
+
+1. माटी के स्वास्थ्य
+2. pH के स्थिति
+3. NPK के स्थिति
+4. नमी के स्थिति
+5. बढ़िया फसल
+6. पोषक तत्व के कमी होखे त सुझाव
+7. किसान खातिर practical सलाह
+
+जवाब भोजपुरी में दीं।
+`;
+
+    }
+
+
+    return `
+You are an agricultural soil analysis AI.
+
+Here is the farmer's soil test information:
+
+${baseData}
+
+Analyze the values and provide:
+
+1. Soil health
+2. pH status
+3. NPK status
+4. Moisture status
+5. Suitable crops
+6. Nutrient deficiency suggestions
+7. Practical recommendations for the farmer
+
+Use simple and easy-to-understand language.
+
 Respond in English.
 `;
 
