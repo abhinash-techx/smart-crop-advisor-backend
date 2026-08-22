@@ -243,7 +243,9 @@ exports.handler = async (event) => {
 
 function getImagePrompt(language) {
 
-    if (language === "hi") {
+    language = String(language || "en").toLowerCase();
+
+    if (language === "hi" || language === "hindi") {
 
         return `
 आप एक कृषि विशेषज्ञ AI हैं।
@@ -327,7 +329,7 @@ Respond in English.
 // =========================================
 
 function getManualPrompt(language, soil) {
-
+language = String(language || "en").toLowerCase().trim();
     const baseData = `
 Soil Type: ${soil.soilType}
 pH: ${soil.ph}
@@ -339,7 +341,7 @@ Location: ${soil.location || "Not provided"}
 `;
 
 
-    if (language === "hi") {
+    if (language === "hi" || language === "hindi") {
 
         return `
 आप एक कृषि विशेषज्ञ AI हैं।
@@ -366,8 +368,7 @@ ${baseData}
     }
 
 
-    if (language === "bho") {
-
+   if (language === "bho" || language === "bhojpuri") {
         return `
 रउआ एगो कृषि विशेषज्ञ AI बानी।
 
