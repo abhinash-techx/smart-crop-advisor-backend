@@ -1,236 +1,432 @@
-const { GoogleGenAI } = require("@google/genai");
-
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
-});
-
-exports.handler = async (event) => {
+// =========================================
+// SMART CROP ADVISOR
+// ANALYZE MY SOIL - JAVASCRIPT
+// =========================================
 
-    // Only POST request allowed
-    if (event.httpMethod !== "POST") {
-        return {
-            statusCode: 405,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                success: false,
-                message: "Method not allowed"
-            })
-        };
-    }
 
-    try {
+// =========================================
+// TRANSLATIONS
+// =========================================
 
-        const data = JSON.parse(event.body || "{}");
-
-        const {
-            mode,
-            language = "en",
-            soilType,
-            ph,
-            nitrogen,
-            phosphorus,
-            potassium,
-            moisture,
-            location,
-            image
-        } = data;
-
-
-        // =====================================
-        // IMAGE ANALYSIS
-        // =====================================
+const translations = {
 
-        if (mode === "image") {
-
-            if (!image) {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: "Soil image is required"
-                    })
-                };
-            }
-
-
-            const prompt = getImagePrompt(language);
-
-
-            const response = await ai.models.generateContent({
+    en: {
 
-                model: "gemini-3.6-flash",
+        badge: "🌱 Smart Soil Analysis",
 
-                contents: [
-                    {
-                        role: "user",
+        title: "Analyze Your Soil",
 
-                        parts: [
-                            {
-                                text: prompt
-                            },
-                            {
-                                inlineData: {
-                                    mimeType: getMimeType(image),
-                                    data: removeBase64Prefix(image)
-                                }
-                            }
-                        ]
-                    }
-                ]
+        subtitle:
+            "Choose how you want to analyze your soil and get personalized crop insights.",
 
-            });
 
+        imageTitle: "Analyze from Soil Image",
 
-            const resultText =
-                response.text || "";
+        imageDescription:
+            "Upload a clear photo of your soil and let AI visually analyze it.",
 
+        imagePoint1: "AI visual soil assessment",
 
-            return {
-                statusCode: 200,
+        imagePoint2: "Soil appearance & moisture insights",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        imagePoint3: "Crop suitability suggestions",
 
-                body: JSON.stringify({
+        imageButton: "📸 Analyze Soil Image",
 
-                    success: true,
 
-                    result: {
-                        visualAssessment: resultText
-                    }
+        manualTitle: "Manual Soil Analysis",
 
-                })
-            };
-        }
+        manualDescription:
+            "Enter your soil test values manually for a detailed analysis.",
 
+        manualPoint1: "pH level",
 
-        // =====================================
-        // MANUAL ANALYSIS
-        // =====================================
+        manualPoint2: "Nitrogen, Phosphorus & Potassium",
 
-        if (mode === "manual") {
+        manualPoint3: "Moisture & soil type",
 
-            if (
-                !soilType ||
-                ph === undefined ||
-                nitrogen === undefined ||
-                phosphorus === undefined ||
-                potassium === undefined ||
-                moisture === undefined
-            ) {
+        manualButton: "📝 Enter Soil Details",
 
-                return {
-                    statusCode: 400,
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+        infoTitle: "Important Note",
 
-                    body: JSON.stringify({
-                        success: false,
-                        message: "Required soil data is missing"
-                    })
-                };
-            }
+        infoText:
+            "Soil images provide an AI-based visual assessment. For accurate pH and NPK values, use soil test results from a reliable soil testing facility.",
 
 
-            const prompt =
-                getManualPrompt(
-                    language,
-                    {
-                        soilType,
-                        ph,
-                        nitrogen,
-                        phosphorus,
-                        potassium,
-                        moisture,
-                        location
-                    }
-                );
+        uploadTitle: "Upload Soil Image",
 
+        uploadDescription:
+            "Upload a clear photo of the soil.",
 
-            const response =
-                await ai.models.generateContent({
+        chooseImage: "Choose Soil Image",
 
-                    model: "gemini-3.6-flash",
+        analyzeImage: "🔍 Analyze Image",
 
-                    contents: prompt
+        imageNote:
+            "Use a clear, well-lit soil photo for better visual analysis.",
 
-                });
 
+        manualFormTitle: "Enter Soil Details",
 
-            const resultText =
-                response.text || "";
+        manualFormDescription:
+            "Enter values from your soil test report.",
 
 
-            return {
-                statusCode: 200,
+        soilType: "Soil Type",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        selectSoil: "Select Soil Type",
 
-                body: JSON.stringify({
+        alluvial: "Alluvial",
 
-                    success: true,
+        black: "Black Soil",
 
-                    result: {
-                        soilHealth: resultText
-                    }
+        red: "Red Soil",
 
-                })
-            };
-        }
+        sandy: "Sandy Soil",
 
+        loamy: "Loamy Soil",
 
-        // =====================================
-        // INVALID MODE
-        // =====================================
+        clay: "Clay Soil",
 
-        return {
-            statusCode: 400,
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        ph: "Soil pH",
 
-            body: JSON.stringify({
-                success: false,
-                message: "Invalid analysis mode"
-            })
-        };
+        nitrogen: "Nitrogen (N)",
 
+        phosphorus: "Phosphorus (P)",
 
-    } catch (error) {
+        potassium: "Potassium (K)",
 
-        console.error(
-            "Analyze Soil Function Error:",
-            error
-        );
+        moisture: "Soil Moisture",
 
+        location: "Location",
 
-        return {
-            statusCode: 500,
+        analyzeSoil: "🌱 Analyze My Soil",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
 
-            body: JSON.stringify({
+        resultTitle: "🌱 Soil Analysis Result",
 
-                success: false,
+        analyzing: "Analyzing your soil...",
 
-                message:
-                    "Soil analysis failed. Please try again."
+        pleaseWait: "Please wait while AI analyzes the information.",
 
-            })
-        };
+        selectImageError: "Please select a soil image first.",
+
+        invalidImage:
+            "Please select a valid image file.",
+
+        analysisFailed:
+            "Unable to analyze the soil right now. Please try again.",
+
+        networkError:
+            "Unable to connect to the soil analysis server.",
+
+        imageTooLarge:
+            "Image size is too large. Please choose an image smaller than 5 MB.",
+
+        manualRequired:
+            "Please fill all required soil details.",
+
+        soilHealth: "Soil Health",
+
+        soilTypeResult: "Soil Type",
+
+        phStatus: "pH Status",
+
+        nutrientStatus: "Nutrient Status",
+
+        moistureStatus: "Moisture Status",
+
+        suitableCrops: "Suitable Crops",
+
+        recommendations: "Recommendations",
+
+        visualAssessment: "AI Visual Assessment",
+
+        confidence: "Confidence"
+
+    },
+
+
+    hi: {
+
+        badge: "🌱 स्मार्ट मिट्टी विश्लेषण",
+
+        title: "अपनी मिट्टी का विश्लेषण करें",
+
+        subtitle:
+            "मिट्टी का विश्लेषण करने का तरीका चुनें और अपनी फसल के लिए उपयोगी जानकारी प्राप्त करें।",
+
+
+        imageTitle: "मिट्टी की फोटो से विश्लेषण",
+
+        imageDescription:
+            "मिट्टी की साफ फोटो अपलोड करें और AI से उसका दृश्य विश्लेषण करवाएं।",
+
+        imagePoint1: "AI द्वारा मिट्टी का दृश्य विश्लेषण",
+
+        imagePoint2: "मिट्टी की स्थिति और नमी की जानकारी",
+
+        imagePoint3: "उपयुक्त फसलों के सुझाव",
+
+        imageButton: "📸 मिट्टी की फोटो का विश्लेषण",
+
+
+        manualTitle: "मैनुअल मिट्टी विश्लेषण",
+
+        manualDescription:
+            "विस्तृत विश्लेषण के लिए अपनी मिट्टी की जांच की जानकारी दर्ज करें।",
+
+        manualPoint1: "pH स्तर",
+
+        manualPoint2: "नाइट्रोजन, फॉस्फोरस और पोटैशियम",
+
+        manualPoint3: "नमी और मिट्टी का प्रकार",
+
+        manualButton: "📝 मिट्टी की जानकारी दर्ज करें",
+
+
+        infoTitle: "महत्वपूर्ण जानकारी",
+
+        infoText:
+            "मिट्टी की फोटो से AI आधारित दृश्य अनुमान मिलता है। सटीक pH और NPK के लिए विश्वसनीय मिट्टी जांच रिपोर्ट का उपयोग करें।",
+
+
+        uploadTitle: "मिट्टी की फोटो अपलोड करें",
+
+        uploadDescription:
+            "मिट्टी की एक साफ फोटो अपलोड करें।",
+
+        chooseImage: "मिट्टी की फोटो चुनें",
+
+        analyzeImage: "🔍 फोटो का विश्लेषण करें",
+
+        imageNote:
+            "बेहतर परिणाम के लिए साफ और पर्याप्त रोशनी वाली मिट्टी की फोटो लें।",
+
+
+        manualFormTitle: "मिट्टी की जानकारी दर्ज करें",
+
+        manualFormDescription:
+            "अपनी मिट्टी जांच रिपोर्ट से मान दर्ज करें।",
+
+
+        soilType: "मिट्टी का प्रकार",
+
+        selectSoil: "मिट्टी का प्रकार चुनें",
+
+        alluvial: "जलोढ़ मिट्टी",
+
+        black: "काली मिट्टी",
+
+        red: "लाल मिट्टी",
+
+        sandy: "बलुई मिट्टी",
+
+        loamy: "दोमट मिट्टी",
+
+        clay: "चिकनी मिट्टी",
+
+
+        ph: "मिट्टी का pH",
+
+        nitrogen: "नाइट्रोजन (N)",
+
+        phosphorus: "फॉस्फोरस (P)",
+
+        potassium: "पोटैशियम (K)",
+
+        moisture: "मिट्टी की नमी",
+
+        location: "स्थान",
+
+        analyzeSoil: "🌱 मेरी मिट्टी का विश्लेषण करें",
+
+
+        resultTitle: "🌱 मिट्टी विश्लेषण परिणाम",
+
+        analyzing: "मिट्टी का विश्लेषण किया जा रहा है...",
+
+        pleaseWait:
+            "कृपया प्रतीक्षा करें, AI जानकारी का विश्लेषण कर रहा है।",
+
+        selectImageError:
+            "कृपया पहले मिट्टी की फोटो चुनें।",
+
+        invalidImage:
+            "कृपया एक सही image file चुनें।",
+
+        analysisFailed:
+            "अभी मिट्टी का विश्लेषण नहीं हो पाया। कृपया दोबारा प्रयास करें।",
+
+        networkError:
+            "मिट्टी विश्लेषण सर्वर से कनेक्ट नहीं हो पाया।",
+
+        imageTooLarge:
+            "फोटो बहुत बड़ी है। कृपया 5 MB से छोटी फोटो चुनें।",
+
+        manualRequired:
+            "कृपया सभी जरूरी मिट्टी की जानकारी भरें।",
+
+        soilHealth: "मिट्टी का स्वास्थ्य",
+
+        soilTypeResult: "मिट्टी का प्रकार",
+
+        phStatus: "pH स्थिति",
+
+        nutrientStatus: "पोषक तत्व स्थिति",
+
+        moistureStatus: "नमी की स्थिति",
+
+        suitableCrops: "उपयुक्त फसलें",
+
+        recommendations: "सुझाव",
+
+        visualAssessment: "AI दृश्य विश्लेषण",
+
+        confidence: "विश्वसनीयता"
+
+    },
+
+
+    bho: {
+
+        badge: "🌱 स्मार्ट माटी जांच",
+
+        title: "आपन माटी के जांच करीं",
+
+        subtitle:
+            "माटी के जांच करे के तरीका चुनीं आ अपना फसल खातिर उपयोगी जानकारी पाईं।",
+
+
+        imageTitle: "माटी के फोटो से जांच",
+
+        imageDescription:
+            "माटी के साफ फोटो अपलोड करीं आ AI से ओकर दृश्य जांच करवाईं।",
+
+        imagePoint1: "AI से माटी के दृश्य जांच",
+
+        imagePoint2: "माटी के हालत आ नमी के जानकारी",
+
+        imagePoint3: "उपयुक्त फसल के सुझाव",
+
+        imageButton: "📸 माटी के फोटो जांचीं",
+
+
+        manualTitle: "मैनुअल माटी जांच",
+
+        manualDescription:
+            "विस्तार से जांच खातिर माटी जांच रिपोर्ट के जानकारी भरीं।",
+
+        manualPoint1: "pH स्तर",
+
+        manualPoint2: "नाइट्रोजन, फॉस्फोरस आ पोटैशियम",
+
+        manualPoint3: "नमी आ माटी के प्रकार",
+
+        manualButton: "📝 माटी के जानकारी भरीं",
+
+
+        infoTitle: "जरूरी जानकारी",
+
+        infoText:
+            "माटी के फोटो से AI आधारित दृश्य अनुमान मिलेला। सही pH आ NPK खातिर भरोसेमंद माटी जांच रिपोर्ट के इस्तेमाल करीं।",
+
+
+        uploadTitle: "माटी के फोटो अपलोड करीं",
+
+        uploadDescription:
+            "माटी के साफ फोटो अपलोड करीं।",
+
+        chooseImage: "माटी के फोटो चुनीं",
+
+        analyzeImage: "🔍 फोटो जांचीं",
+
+        imageNote:
+            "बेहतर परिणाम खातिर साफ आ बढ़िया रोशनी वाला माटी के फोटो लीं।",
+
+
+        manualFormTitle: "माटी के जानकारी भरीं",
+
+        manualFormDescription:
+            "अपना माटी जांच रिपोर्ट से मान भरीं।",
+
+
+        soilType: "माटी के प्रकार",
+
+        selectSoil: "माटी के प्रकार चुनीं",
+
+        alluvial: "जलोढ़ माटी",
+
+        black: "काली माटी",
+
+        red: "लाल माटी",
+
+        sandy: "बलुई माटी",
+
+        loamy: "दोमट माटी",
+
+        clay: "चिकन माटी",
+
+
+        ph: "माटी के pH",
+
+        nitrogen: "नाइट्रोजन (N)",
+
+        phosphorus: "फॉस्फोरस (P)",
+
+        potassium: "पोटैशियम (K)",
+
+        moisture: "माटी के नमी",
+
+        location: "जगह",
+
+        analyzeSoil: "🌱 हमार माटी के जांच करीं",
+
+
+        resultTitle: "🌱 माटी जांच के नतीजा",
+
+        analyzing: "माटी के जांच हो रहल बा...",
+
+        pleaseWait:
+            "थोड़ा इंतजार करीं, AI जानकारी के जांच कर रहल बा।",
+
+        selectImageError:
+            "पहिले माटी के फोटो चुनीं।",
+
+        invalidImage:
+            "कृपया सही image file चुनीं।",
+
+        analysisFailed:
+            "अभी माटी के जांच ना हो पावल। फेर से कोशिश करीं।",
+
+        networkError:
+            "माटी जांच सर्वर से कनेक्शन ना हो पावल।",
+
+        imageTooLarge:
+            "फोटो बहुत बड़ बा। 5 MB से छोट फोटो चुनीं।",
+
+        manualRequired:
+            "जरूरी माटी के जानकारी पूरा भरीं।",
+
+        soilHealth: "माटी के स्वास्थ्य",
+
+        soilTypeResult: "माटी के प्रकार",
+
+        phStatus: "pH के स्थिति",
+
+        nutrientStatus: "पोषक तत्व के स्थिति",
+
+        moistureStatus: "नमी के स्थिति",
+
+        suitableCrops: "उपयुक्त फसल",
+
+        recommendations: "सुझाव",
+
+        visualAssessment: "AI से दृश्य जांच",
+
+        confidence: "विश्वसनीयता"
 
     }
 
@@ -238,483 +434,856 @@ exports.handler = async (event) => {
 
 
 // =========================================
-// IMAGE PROMPT
+// GLOBAL VARIABLES
 // =========================================
 
-function getImagePrompt(language) {
+let currentLanguage = "en";
 
-    if (language === "hi") {
+let selectedSoilImage = null;
 
-        return `
-आप एक कृषि विशेषज्ञ AI हैं।
 
-दिए गए मिट्टी के फोटो का केवल दृश्य आधार पर विश्लेषण करें।
+// =========================================
+// DOM ELEMENTS
+// =========================================
 
-महत्वपूर्ण:
-- फोटो से exact pH, NPK या laboratory values का दावा न करें।
-- जहां अनुमान हो वहां "संभावित" या "अनुमान" लिखें।
-- उत्तर छोटा, साफ और किसान के लिए आसान होना चाहिए।
-- लंबे paragraph बिल्कुल न लिखें।
+const languageSelect =
+    document.getElementById("languageSelect");
 
-उत्तर बिल्कुल इस format में दें:
+const imageAnalysisBtn =
+    document.getElementById("imageAnalysisBtn");
 
-🌱 मिट्टी की स्थिति:
-• 1-2 छोटे points
+const manualAnalysisBtn =
+    document.getElementById("manualAnalysisBtn");
 
-🪨 संभावित मिट्टी का प्रकार:
-• 1-2 छोटे points
+const imageModal =
+    document.getElementById("imageModal");
 
-💧 नमी की स्थिति:
-• 1-2 छोटे points
+const manualModal =
+    document.getElementById("manualModal");
 
-🌾 उपयुक्त फसलें:
-• फसल 1
-• फसल 2
-• फसल 3
+const closeImageModal =
+    document.getElementById("closeImageModal");
 
-⚠️ ध्यान देने योग्य बातें:
-• 1-2 छोटे points
+const closeManualModal =
+    document.getElementById("closeManualModal");
 
-👨‍🌾 किसान के लिए सुझाव:
-• 2-3 practical points
+const soilImage =
+    document.getElementById("soilImage");
 
-उत्तर केवल हिंदी में दें।
-`;
+const fileName =
+    document.getElementById("fileName");
 
+const analyzeImageBtn =
+    document.getElementById("analyzeImageBtn");
+
+const soilForm =
+    document.getElementById("soilForm");
+
+const soilResult =
+    document.getElementById("soilResult");
+
+const resultContent =
+    document.getElementById("resultContent");
+
+
+// =========================================
+// LANGUAGE SWITCH
+// =========================================
+
+function changeLanguage(language) {
+
+    if (!translations[language]) {
+        language = "en";
     }
 
+    currentLanguage = language;
 
-    if (language === "bho") {
+    document.documentElement.lang = language;
 
-        return `
-रउआ एगो कृषि विशेषज्ञ AI बानी।
+    const elements =
+        document.querySelectorAll("[data-i18n]");
 
-दिहल गइल माटी के फोटो के खाली दृश्य आधार पर जांचीं।
+    elements.forEach(element => {
 
-जरूरी:
-- फोटो से exact pH, NPK या laboratory value बतावे के दावा मत करीं।
-- जहां अनुमान होखे, "संभावित" या "अनुमान" साफ लिखीं।
-- जवाब छोट, साफ आ किसान खातिर आसान होखे।
-- लंबा paragraph बिल्कुल मत लिखीं।
+        const key =
+            element.getAttribute("data-i18n");
 
-जवाब ठीक एह format में दीं:
+        if (
+            translations[currentLanguage] &&
+            translations[currentLanguage][key]
+        ) {
+            element.textContent =
+                translations[currentLanguage][key];
+        }
 
-🌱 माटी के स्थिति:
-• 1-2 छोट points
-
-🪨 संभावित माटी के प्रकार:
-• 1-2 छोट points
-
-💧 नमी के स्थिति:
-• 1-2 छोट points
-
-🌾 बढ़िया फसल:
-• फसल 1
-• फसल 2
-• फसल 3
-
-⚠️ ध्यान देवे लायक बात:
-• 1-2 छोट points
-
-👨‍🌾 किसान खातिर सुझाव:
-• 2-3 practical points
-
-जवाब खाली भोजपुरी में दीं।
-`;
-
-    }
-
-
-    return `
-You are an agricultural soil analysis AI.
-
-Analyze the provided soil image using visual observations only.
-
-IMPORTANT:
-- Do NOT claim exact pH, NPK or laboratory values from an ordinary photograph.
-- Clearly label estimates as "Possible" or "Estimated".
-- Keep the answer short and easy for a farmer to understand.
-- Do NOT write long paragraphs.
-
-Use EXACTLY this format:
-
-🌱 Soil Condition:
-• 1-2 short points
-
-🪨 Possible Soil Type:
-• 1-2 short points
-
-💧 Moisture Condition:
-• 1-2 short points
-
-🌾 Suitable Crops:
-• Crop 1
-• Crop 2
-• Crop 3
-
-⚠️ Things to Watch:
-• 1-2 short points
-
-👨‍🌾 Farmer Recommendations:
-• 2-3 practical points
-
-Respond only in English.
-`;
+    });
 
 }
 
-    if (language === "hi") {
 
-        return `
-आप एक कृषि विशेषज्ञ AI हैं।
+// Language dropdown event
+languageSelect.addEventListener("change", function () {
 
-दिए गए मिट्टी के फोटो का सावधानीपूर्वक दृश्य विश्लेषण करें।
+    changeLanguage(this.value);
 
-महत्वपूर्ण:
-केवल फोटो के आधार पर pH, NPK या अन्य laboratory values को exact बताने का दावा न करें।
-
-विश्लेषण में बताएं:
-
-1. मिट्टी की दिखाई देने वाली विशेषताएं
-2. संभावित मिट्टी का प्रकार
-3. नमी की दृश्य स्थिति
-4. मिट्टी की सामान्य स्थिति
-5. संभावित रूप से उपयुक्त फसलें
-6. किसान के लिए व्यावहारिक सुझाव
-
-जहां जानकारी केवल अनुमान है, वहां स्पष्ट रूप से "संभावित" या "अनुमान" शब्द का उपयोग करें।
-
-उत्तर हिंदी में दें।
-`;
-
-    }
-
-
-    if (language === "bho") {
-
-        return `
-रउआ एगो कृषि विशेषज्ञ AI बानी।
-
-दिहल गइल माटी के फोटो के ध्यान से दृश्य जांच करीं।
-
-जरूरी:
-सिर्फ फोटो के आधार पर pH, NPK या laboratory value के exact बतावे के दावा मत करीं।
-
-जांच में बताईं:
-
-1. माटी में देखाई देत विशेषता
-2. संभावित माटी के प्रकार
-3. नमी के दृश्य स्थिति
-4. माटी के सामान्य हालत
-5. संभावित रूप से बढ़िया फसल
-6. किसान खातिर काम के सुझाव
-
-जहां जानकारी अनुमान पर आधारित होखे, साफ-साफ बताईं कि ई संभावित/अनुमान बा।
-
-जवाब भोजपुरी में दीं।
-`;
-
-    }
-
-
-    return `
-You are an agricultural soil analysis AI.
-
-Carefully analyze the provided soil image visually.
-
-Important:
-Do NOT claim exact pH, NPK or laboratory measurements from an ordinary photograph.
-
-Provide:
-
-1. Visible soil characteristics
-2. Possible soil type
-3. Visual moisture condition
-4. General soil condition
-5. Potentially suitable crops
-6. Practical suggestions for the farmer
-
-Clearly mention when something is only an estimate or visual observation.
-
-Respond in English.
-`;
-
-
+});
 
 
 // =========================================
-// MANUAL PROMPT
+// OPEN IMAGE MODAL
 // =========================================
 
-function getManualPrompt(language, soil) {
+imageAnalysisBtn.addEventListener("click", function () {
 
-    const baseData = `
-Soil Type: ${soil.soilType}
-pH: ${soil.ph}
-Nitrogen (N): ${soil.nitrogen}
-Phosphorus (P): ${soil.phosphorus}
-Potassium (K): ${soil.potassium}
-Moisture: ${soil.moisture}%
-Location: ${soil.location || "Not provided"}
-`;
+    imageModal.classList.remove("hidden");
+
+});
 
 
-    if (language === "hi") {
+// =========================================
+// OPEN MANUAL MODAL
+// =========================================
 
-        return `
-आप एक कृषि विशेषज्ञ AI हैं।
+manualAnalysisBtn.addEventListener("click", function () {
 
-किसान की मिट्टी की जानकारी:
+    manualModal.classList.remove("hidden");
 
-${baseData}
+});
 
-इन values का विश्लेषण करें।
 
-लंबे paragraph बिल्कुल न लिखें।
-उत्तर छोटे और स्पष्ट bullet points में दें।
+// =========================================
+// CLOSE IMAGE MODAL
+// =========================================
 
-ठीक इस format का उपयोग करें:
+closeImageModal.addEventListener("click", function () {
 
-🌱 मिट्टी का स्वास्थ्य:
-• स्थिति बताएं
-• छोटा कारण बताएं
+    imageModal.classList.add("hidden");
 
-🧪 pH की स्थिति:
-• pH कैसा है
-• इसका प्रभाव क्या है
+});
 
-🌿 NPK की स्थिति:
-• Nitrogen (N): स्थिति
-• Phosphorus (P): स्थिति
-• Potassium (K): स्थिति
 
-💧 नमी की स्थिति:
-• स्थिति बताएं
+// =========================================
+// CLOSE MANUAL MODAL
+// =========================================
 
-🌾 उपयुक्त फसलें:
-• फसल 1
-• फसल 2
-• फसल 3
+closeManualModal.addEventListener("click", function () {
 
-⚠️ पोषक तत्वों की कमी:
-• यदि कोई कमी है तो बताएं
-• सुधार का छोटा सुझाव दें
+    manualModal.classList.add("hidden");
 
-👨‍🌾 किसान के लिए सुझाव:
-• 2-3 practical recommendations
+});
 
-उत्तर केवल आसान हिंदी में दें।
-`;
 
+// =========================================
+// CLOSE MODAL WHEN CLICKING OUTSIDE
+// =========================================
+
+imageModal.addEventListener("click", function (event) {
+
+    if (event.target === imageModal) {
+        imageModal.classList.add("hidden");
+    }
+
+});
+
+
+manualModal.addEventListener("click", function (event) {
+
+    if (event.target === manualModal) {
+        manualModal.classList.add("hidden");
+    }
+
+});
+
+
+// =========================================
+// IMAGE SELECTION
+// =========================================
+
+soilImage.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) {
+        selectedSoilImage = null;
+        fileName.textContent = "";
+        return;
     }
 
 
-    if (language === "bho") {
+    // Check file type
+    if (!file.type.startsWith("image/")) {
 
-        return `
-रउआ एगो कृषि विशेषज्ञ AI बानी।
+        alert(
+            translations[currentLanguage].invalidImage
+        );
 
-किसान के माटी के जानकारी:
+        this.value = "";
 
-${baseData}
+        selectedSoilImage = null;
 
-एह जानकारी के जांचीं।
+        fileName.textContent = "";
 
-लंबा paragraph बिल्कुल मत लिखीं।
-जवाब छोट आ साफ bullet points में दीं।
-
-ठीक एह format में जवाब दीं:
-
-🌱 माटी के स्वास्थ्य:
-• स्थिति बताईं
-• छोट कारण बताईं
-
-🧪 pH के स्थिति:
-• pH कइसन बा
-• एकर असर का बा
-
-🌿 NPK के स्थिति:
-• Nitrogen (N): स्थिति
-• Phosphorus (P): स्थिति
-• Potassium (K): स्थिति
-
-💧 नमी के स्थिति:
-• स्थिति बताईं
-
-🌾 बढ़िया फसल:
-• फसल 1
-• फसल 2
-• फसल 3
-
-⚠️ पोषक तत्व के कमी:
-• अगर कमी बा त बताईं
-• सुधार के छोट सुझाव दीं
-
-👨‍🌾 किसान खातिर सुझाव:
-• 2-3 practical सलाह
-
-जवाब खाली आसान भोजपुरी में दीं।
-`;
-
+        return;
     }
 
 
-    return `
-You are an agricultural soil analysis AI.
+    // Check file size - 5 MB
+    if (file.size > 5 * 1024 * 1024) {
 
-Farmer's soil information:
+        alert(
+            translations[currentLanguage].imageTooLarge
+        );
 
-${baseData}
+        this.value = "";
 
-Analyze the information.
+        selectedSoilImage = null;
 
-Do NOT write long paragraphs.
-Give the answer in short, clear bullet points.
+        fileName.textContent = "";
 
-Use EXACTLY this format:
-
-🌱 Soil Health:
-• Give the health status
-• Give a short reason
-
-🧪 pH Status:
-• Explain the pH status
-• Mention its possible effect
-
-🌿 NPK Status:
-• Nitrogen (N): status
-• Phosphorus (P): status
-• Potassium (K): status
-
-💧 Moisture Status:
-• Give the moisture status
-
-🌾 Suitable Crops:
-• Crop 1
-• Crop 2
-• Crop 3
-
-⚠️ Nutrient Deficiency:
-• Mention any deficiency
-• Give a short improvement suggestion
-
-👨‍🌾 Farmer Recommendations:
-• 2-3 practical recommendations
-
-Respond only in simple English.
-`;
-
-}
-
-    const baseData = `
-Soil Type: ${soil.soilType}
-pH: ${soil.ph}
-Nitrogen (N): ${soil.nitrogen}
-Phosphorus (P): ${soil.phosphorus}
-Potassium (K): ${soil.potassium}
-Moisture: ${soil.moisture}%
-Location: ${soil.location || "Not provided"}
-`;
-
-
-    if (language === "hi") {
-
-        return `
-आप एक कृषि विशेषज्ञ AI हैं।
-
-नीचे किसान की मिट्टी की जांच की जानकारी दी गई है:
-
-${baseData}
-
-इन values का विश्लेषण करके आसान हिंदी में बताएं:
-
-1. मिट्टी का स्वास्थ्य
-2. pH की स्थिति
-3. NPK की स्थिति
-4. नमी की स्थिति
-5. उपयुक्त फसलें
-6. पोषक तत्वों की कमी होने पर सुझाव
-7. किसान के लिए practical recommendations
-
-जहां संभव हो, स्पष्ट और आसान भाषा का उपयोग करें।
-
-उत्तर हिंदी में दें।
-`;
-
+        return;
     }
 
 
-    if (language === "bho") {
+    selectedSoilImage = file;
 
-        return `
-रउआ एगो कृषि विशेषज्ञ AI बानी।
+    fileName.textContent =
+        `📎 ${file.name}`;
 
-किसान के माटी जांच के जानकारी नीचे दिहल बा:
+});
 
-${baseData}
 
-एकरा के आसान भोजपुरी में जांचीं आ बताईं:
+// =========================================
+// IMAGE ANALYSIS
+// =========================================
 
-1. माटी के स्वास्थ्य
-2. pH के स्थिति
-3. NPK के स्थिति
-4. नमी के स्थिति
-5. बढ़िया फसल
-6. पोषक तत्व के कमी होखे त सुझाव
-7. किसान खातिर practical सलाह
+analyzeImageBtn.addEventListener("click", async function () {
 
-जवाब भोजपुरी में दीं।
-`;
+    if (!selectedSoilImage) {
 
+        alert(
+            translations[currentLanguage].selectImageError
+        );
+
+        return;
     }
 
 
-    return `
-You are an agricultural soil analysis AI.
+    showLoading();
 
-Here is the farmer's soil test information:
 
-${baseData}
+    try {
 
-Analyze the values and provide:
+        const base64Image =
+            await convertImageToBase64(selectedSoilImage);
 
-1. Soil health
-2. pH status
-3. NPK status
-4. Moisture status
-5. Suitable crops
-6. Nutrient deficiency suggestions
-7. Practical recommendations for the farmer
 
-Use simple and easy-to-understand language.
+        const response = await fetch(
+            "/api/analyze-soil",
+            {
+                method: "POST",
 
-Respond in English.
-`;
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    mode: "image",
+
+                    language: currentLanguage,
+
+                    image: base64Image
+
+                })
+
+            }
+        );
+
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+
+        const data = await response.json();
+
+
+        if (!data.success) {
+            throw new Error(
+                data.message || "Analysis failed"
+            );
+        }
+
+
+        showResult(data.result);
+
+
+    } catch (error) {
+
+        console.error(
+            "Soil image analysis error:",
+            error
+        );
+
+        showError(
+            translations[currentLanguage].analysisFailed
+        );
+
+    }
+
+});
+
+
+// =========================================
+// CONVERT IMAGE TO BASE64
+// =========================================
+
+function convertImageToBase64(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+
+            resolve(reader.result);
+
+        };
+
+        reader.onerror = function () {
+
+            reject(
+                new Error("Unable to read image")
+            );
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
 
 }
 
 
 // =========================================
-// IMAGE HELPERS
+// MANUAL SOIL ANALYSIS
 // =========================================
 
-function removeBase64Prefix(image) {
+soilForm.addEventListener("submit", async function (event) {
 
-    return image.replace(
-        /^data:image\/[a-zA-Z0-9.+-]+;base64,/,
-        ""
-    );
+    event.preventDefault();
+
+
+    const soilType =
+        document.getElementById("soilType").value;
+
+    const ph =
+        document.getElementById("ph").value;
+
+    const nitrogen =
+        document.getElementById("nitrogen").value;
+
+    const phosphorus =
+        document.getElementById("phosphorus").value;
+
+    const potassium =
+        document.getElementById("potassium").value;
+
+    const moisture =
+        document.getElementById("moisture").value;
+
+    const location =
+        document.getElementById("location").value;
+
+
+    // Basic validation
+    if (
+        !soilType ||
+        !ph ||
+        !nitrogen ||
+        !phosphorus ||
+        !potassium ||
+        !moisture
+    ) {
+
+        alert(
+            translations[currentLanguage].manualRequired
+        );
+
+        return;
+    }
+
+
+    const soilData = {
+
+        mode: "manual",
+
+        language: currentLanguage,
+
+        soilType: soilType,
+
+        ph: Number(ph),
+
+        nitrogen: Number(nitrogen),
+
+        phosphorus: Number(phosphorus),
+
+        potassium: Number(potassium),
+
+        moisture: Number(moisture),
+
+        location: location.trim()
+
+    };
+
+
+    showLoading();
+
+
+    try {
+
+        const response = await fetch(
+            "/api/analyze-soil",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(soilData)
+
+            }
+        );
+
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+            throw new Error(
+                data.message || "Analysis failed"
+            );
+        }
+
+
+        manualModal.classList.add("hidden");
+
+
+        showResult(data.result);
+
+
+    } catch (error) {
+
+        console.error(
+            "Manual soil analysis error:",
+            error
+        );
+
+        showError(
+            translations[currentLanguage].analysisFailed
+        );
+
+    }
+
+});
+
+
+// =========================================
+// SHOW LOADING
+// =========================================
+
+function showLoading() {
+
+    soilResult.classList.remove("hidden");
+
+    resultContent.innerHTML = `
+
+        <div class="loading">
+
+            <div class="loading-spinner"></div>
+
+            <h3>
+                ${translations[currentLanguage].analyzing}
+            </h3>
+
+            <p>
+                ${translations[currentLanguage].pleaseWait}
+            </p>
+
+        </div>
+
+    `;
+
+
+    soilResult.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 
 }
 
 
-function getMimeType(image) {
+// =========================================
+// SHOW ERROR
+// =========================================
 
-    const match =
-        image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+function showError(message) {
 
-    return match
-        ? match[1]
-        : "image/jpeg";
+    soilResult.classList.remove("hidden");
+
+    resultContent.innerHTML = `
+
+        <div class="error-message">
+
+            ❌ ${escapeHTML(message)}
+
+        </div>
+
+    `;
+
+
+    soilResult.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 
 }
+
+
+// =========================================
+// SHOW RESULT
+// =========================================
+
+function showResult(result) {
+
+    soilResult.classList.remove("hidden");
+
+
+    if (!result) {
+
+        showError(
+            translations[currentLanguage].analysisFailed
+        );
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    // Soil Health
+    if (result.soilHealth) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🌱 ${translations[currentLanguage].soilHealth}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.soilHealth)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Soil Type
+    if (result.soilType) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🌍 ${translations[currentLanguage].soilTypeResult}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.soilType)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // pH
+    if (result.phStatus) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🧪 ${translations[currentLanguage].phStatus}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.phStatus)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Nutrients
+    if (result.nutrientStatus) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🧬 ${translations[currentLanguage].nutrientStatus}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.nutrientStatus)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Moisture
+    if (result.moistureStatus) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    💧 ${translations[currentLanguage].moistureStatus}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.moistureStatus)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Suitable Crops
+    if (result.suitableCrops) {
+
+        let crops = "";
+
+        if (Array.isArray(result.suitableCrops)) {
+
+            crops =
+                result.suitableCrops
+                    .map(crop => `🌾 ${escapeHTML(crop)}`)
+                    .join("<br>");
+
+        } else {
+
+            crops =
+                escapeHTML(result.suitableCrops);
+
+        }
+
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🌾 ${translations[currentLanguage].suitableCrops}
+                </h3>
+
+                <p>
+                    ${crops}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Recommendations
+    if (result.recommendations) {
+
+        let recommendations = "";
+
+
+        if (Array.isArray(result.recommendations)) {
+
+            recommendations =
+                result.recommendations
+                    .map(item =>
+                        `✓ ${escapeHTML(item)}`
+                    )
+                    .join("<br>");
+
+        } else {
+
+            recommendations =
+                escapeHTML(result.recommendations);
+
+        }
+
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    💡 ${translations[currentLanguage].recommendations}
+                </h3>
+
+                <p>
+                    ${recommendations}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // AI Visual Assessment
+    if (result.visualAssessment) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    📸 ${translations[currentLanguage].visualAssessment}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.visualAssessment)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // Confidence
+    if (result.confidence) {
+
+        html += `
+
+            <div class="result-item">
+
+                <h3>
+                    🎯 ${translations[currentLanguage].confidence}
+                </h3>
+
+                <p>
+                    ${escapeHTML(result.confidence)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    if (!html) {
+
+        html = `
+
+            <div class="result-item">
+
+                <p>
+                    ${escapeHTML(
+                        JSON.stringify(result)
+                    )}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    resultContent.innerHTML = html;
+
+
+    soilResult.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+// =========================================
+// HTML SECURITY
+// =========================================
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// =========================================
+// INITIAL LANGUAGE
+// =========================================
+
+changeLanguage("en");
+
+
+// =========================================
+// ESC KEY CLOSE MODALS
+// =========================================
+
+document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape") {
+
+        imageModal.classList.add("hidden");
+
+        manualModal.classList.add("hidden");
+
+    }
+
+});
