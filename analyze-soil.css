@@ -21,6 +21,7 @@ body {
 }
 
 
+
 /* =========================================
    HEADER
    ========================================= */
@@ -44,6 +45,8 @@ body {
     font-size: 22px;
     font-weight: 700;
     color: #176b35;
+    display: flex;
+    column-gap: 4px;
 }
 
 .language-select {
@@ -226,6 +229,15 @@ body {
 /* =========================================
    BUTTONS
    ========================================= */
+.analysis-btn,
+.analyze-upload-btn {
+    display: flex;
+    column-gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+
 
 .analysis-btn,
 .submit-btn,
@@ -368,7 +380,7 @@ body {
     margin-bottom: 10px;
 }
 
-.modal-content > p {
+.modal-content>p {
     color: #69756d;
     line-height: 1.6;
     margin-bottom: 25px;
