@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Current Weather | Smart Crop Advisor</title>
+
+    <link
+        rel="stylesheet"
+        href="current-weather.css"
+    >
+
+</head>
+
+<body>
+
+    <div class="weather-page">
+
+        <header class="weather-header">
+
+            <a href="index.html" class="back-btn">
+                ← Back
+            </a>
+
+            <div class="language-box">
+
+                <label for="language">
+                    Language
+                </label>
+
+                <select id="language">
+
+                    <option value="en">
+                        English
+                    </option>
+
+                    <option value="hi">
+                        हिंदी
+                    </option>
+
+                    <option value="bho">
+                        भोजपुरी
+                    </option>
+
+                </select>
+
+            </div>
+
+        </header>
+
+
+        <main class="weather-container">
+
+            <section class="hero-section">
+
+                <div class="weather-icon">
+                    🌦️
+                </div>
+
+                <p class="badge" id="badge">
+                    🌾 Smart Weather Advisory
+                </p>
+
+                <h1 id="title">
+                    Current Weather
+                </h1>
+
+                <p id="subtitle">
+                    Get live weather information and farming advice based on your current location.
+                </p>
+
+            </section>
+
+
+            <section class="location-card">
+
+                <div>
+
+                    <span class="location-icon">
+                        📍
+                    </span>
+
+                    <span id="locationStatus">
+                        Location permission is required
+                    </span>
+
+                </div>
+
+                <button
+                    id="getWeatherBtn"
+                    class="weather-btn"
+                >
+                    Get Current Weather
+                </button>
+
+            </section>
+
+
+            <div
+                id="loading"
+                class="loading hidden"
+            >
+                <div class="spinner"></div>
+
+                <p id="loadingText">
+                    Getting current weather...
+                </p>
+
+            </div>
+
+
+            <section
+                id="weatherResult"
+                class="weather-result hidden"
+            >
+
+                <div class="weather-main-card">
+
+                    <div class="main-weather-icon" id="weatherIcon">
+                        ☀️
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="temperature"
+                            id="temperature"
+                        >
+                            --°C
+                        </div>
+
+                        <div
+                            class="condition"
+                            id="condition"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="weather-grid">
+
+                    <div class="weather-card">
+
+                        <div class="card-icon">
+                            🌡️
+                        </div>
+
+                        <span id="feelsLabel">
+                            Feels Like
+                        </span>
+
+                        <strong id="feelsLike">
+                            --°C
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-card">
+
+                        <div class="card-icon">
+                            💧
+                        </div>
+
+                        <span id="humidityLabel">
+                            Humidity
+                        </span>
+
+                        <strong id="humidity">
+                            --%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-card">
+
+                        <div class="card-icon">
+                            🌧️
+                        </div>
+
+                        <span id="rainLabel">
+                            Rain
+                        </span>
+
+                        <strong id="rain">
+                            -- mm
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-card">
+
+                        <div class="card-icon">
+                            💨
+                        </div>
+
+                        <span id="windLabel">
+                            Wind
+                        </span>
+
+                        <strong id="wind">
+                            -- km/h
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <section class="advisory-section">
+
+                    <div class="advisory-title">
+
+                        <span>
+                            🌾
+                        </span>
+
+                        <h2 id="advisoryTitle">
+                            Farmer Advisory
+                        </h2>
+
+                    </div>
+
+                    <div id="advisoryList"></div>
+
+                </section>
+
+            </section>
+
+
+            <div
+                id="errorMessage"
+                class="error-message hidden"
+            ></div>
+
+        </main>
+
+    </div>
+
+
+    <script src="current-weather.js"></script>
+
+</body>
+
+</html>
