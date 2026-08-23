@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +9,44 @@
 
     <link rel="stylesheet" href="analyze-soil.css">
 </head>
+<style>
+    .icons {
+        width: 30px;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .s-icons {
+        width: 15px;
+    }
+
+    .b-icons {
+        width: 35px;
+    }
+
+    .m-icons {
+        width: 20px;
+        margin-bottom: 3px;
+    }
+
+    .n-paste-icons {
+        width: 17px;
+        margin-bottom: 2.5px;
+    }
+    .n-plant-icons{
+        width: 20px;
+        margin-bottom: 0px;
+    }
+</style>
 
 <body>
+
 
     <!-- Header -->
     <header class="header">
 
-        <div class="logo">
-            🌱 Smart Crop Advisor
+        <div style="display: flex; column-gap: 6px; align-items: center;">
+            <img class=" icons" src="Public/plant.svg" alt=""> Smart Crop Advisor
         </div>
 
         <!-- Language Switch -->
@@ -33,8 +64,8 @@
 
         <section class="hero-section">
 
-            <span class="badge" data-i18n="badge">
-                🌱 Smart Soil Analysis
+            <span class="badge">
+                <img class="s-icons" src="Public/plant.svg" alt=""> Smart Soil Analysis
             </span>
 
             <h1 data-i18n="title">
@@ -56,7 +87,7 @@
             <div class="analysis-card image-card">
 
                 <div class="card-icon">
-                    📸
+                    <img class="b-icons" src="Public/camera.svg" alt="">
                 </div>
 
                 <h2 data-i18n="imageTitle">
@@ -74,12 +105,8 @@
                     <li data-i18n="imagePoint3">Crop suitability suggestions</li>
                 </ul>
 
-                <button
-                    class="analysis-btn"
-                    id="imageAnalysisBtn"
-                    type="button"
-                    data-i18n="imageButton">
-                    📸 Analyze Soil Image
+                <button class="analysis-btn" id="imageAnalysisBtn" type="button">
+                    <img class="m-icons" src="Public/n-camera.svg" alt=""> Analyze Soil Image
                 </button>
 
             </div>
@@ -89,7 +116,7 @@
             <div class="analysis-card manual-card">
 
                 <div class="card-icon">
-                    📝
+                    <img class="b-icons" src="Public/note.svg" alt="">
                 </div>
 
                 <h2 data-i18n="manualTitle">
@@ -107,12 +134,8 @@
                     <li data-i18n="manualPoint3">Moisture & soil type</li>
                 </ul>
 
-                <button
-                    class="analysis-btn"
-                    id="manualAnalysisBtn"
-                    type="button"
-                    data-i18n="manualButton">
-                    📝 Enter Soil Details
+                <button class="analysis-btn" id="manualAnalysisBtn" type="button">
+                    <img class="n-paste-icons" src="Public/n-paste.svg" alt=""> Enter Soil Details
                 </button>
 
             </div>
@@ -123,7 +146,7 @@
         <!-- Information -->
         <section class="info-box">
 
-            <div class="info-icon">💡</div>
+            <div class="info-icon"><img class="icons" src="Public/bulb.svg" alt=""></div>
 
             <div>
                 <h3 data-i18n="infoTitle">
@@ -162,29 +185,21 @@
             <div class="upload-area">
 
                 <div class="upload-icon">
-                    📷
+                    <img class="b-icons" src="Public/camera.svg" alt="">
                 </div>
 
                 <label for="soilImage" class="upload-label" data-i18n="chooseImage">
                     Choose Soil Image
                 </label>
 
-                <input
-                    type="file"
-                    id="soilImage"
-                    accept="image/*"
-                    capture="environment">
+                <input type="file" id="soilImage" accept="image/*" capture="environment">
 
                 <p id="fileName" class="file-name"></p>
 
             </div>
 
-            <button
-                class="analyze-upload-btn"
-                id="analyzeImageBtn"
-                type="button"
-                data-i18n="analyzeImage">
-                🔍 Analyze Image
+            <button class="analyze-upload-btn" id="analyzeImageBtn" type="button" >
+                <img class="m-icons" src="Public/search1.svg" alt=""> Analyze Image
             </button>
 
             <p class="small-note" data-i18n="imageNote">
@@ -257,14 +272,7 @@
                     Soil pH
                 </label>
 
-                <input
-                    type="number"
-                    id="ph"
-                    min="0"
-                    max="14"
-                    step="0.1"
-                    placeholder="e.g. 6.5"
-                    required>
+                <input type="number" id="ph" min="0" max="14" step="0.1" placeholder="e.g. 6.5" required>
 
 
                 <!-- Nitrogen -->
@@ -272,13 +280,7 @@
                     Nitrogen (N)
                 </label>
 
-                <input
-                    type="number"
-                    id="nitrogen"
-                    min="0"
-                    step="0.1"
-                    placeholder="mg/kg"
-                    required>
+                <input type="number" id="nitrogen" min="0" step="0.1" placeholder="mg/kg" required>
 
 
                 <!-- Phosphorus -->
@@ -286,13 +288,7 @@
                     Phosphorus (P)
                 </label>
 
-                <input
-                    type="number"
-                    id="phosphorus"
-                    min="0"
-                    step="0.1"
-                    placeholder="mg/kg"
-                    required>
+                <input type="number" id="phosphorus" min="0" step="0.1" placeholder="mg/kg" required>
 
 
                 <!-- Potassium -->
@@ -300,13 +296,7 @@
                     Potassium (K)
                 </label>
 
-                <input
-                    type="number"
-                    id="potassium"
-                    min="0"
-                    step="0.1"
-                    placeholder="mg/kg"
-                    required>
+                <input type="number" id="potassium" min="0" step="0.1" placeholder="mg/kg" required>
 
 
                 <!-- Moisture -->
@@ -314,14 +304,7 @@
                     Soil Moisture
                 </label>
 
-                <input
-                    type="number"
-                    id="moisture"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    placeholder="%"
-                    required>
+                <input type="number" id="moisture" min="0" max="100" step="0.1" placeholder="%" required>
 
 
                 <!-- Location -->
@@ -329,17 +312,11 @@
                     Location
                 </label>
 
-                <input
-                    type="text"
-                    id="location"
-                    placeholder="Village / District / State">
+                <input type="text" id="location" placeholder="Village / District / State">
 
 
-                <button
-                    type="submit"
-                    class="submit-btn"
-                    data-i18n="analyzeSoil">
-                    🌱 Analyze My Soil
+                <button type="submit" class="submit-btn" >
+                    <img class="n-plant-icons" src="Public/n-plant.svg" alt=""> Analyze My Soil
                 </button>
 
             </form>
@@ -368,4 +345,5 @@
     <script src="analyze-soil.js"></script>
 
 </body>
+
 </html>
